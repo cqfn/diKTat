@@ -13,10 +13,7 @@ import org.cqfn.diktat.ruleset.utils.search.findAllVariablesWithUsages
 import org.jetbrains.kotlin.com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.com.intellij.psi.PsiWhiteSpace
-import org.jetbrains.kotlin.psi.KtBlockExpression
-import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtNameReferenceExpression
-import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.parents
 import org.jetbrains.kotlin.psi.psiUtil.parentsWithSelf
@@ -81,7 +78,7 @@ class LocalVariablesRule(private val configRules: List<RulesConfig>) : Rule("loc
 
             .filterNot { it.value.isEmpty() }
 
-    private fun groupPropertiesByUsages(propertiesToUsages: Map<KtProperty, List<KtNameReferenceExpression>>) = propertiesToUsages
+    private fun groupPropertiesByUsages(propertiesToUsages: Map<KtProperty, List<KtElement>>) = propertiesToUsages
             .mapValues { (property, usages) ->
                 getFirstUsageStatementOrBlock(usages, property.getDeclarationScope())
             }
@@ -91,7 +88,8 @@ class LocalVariablesRule(private val configRules: List<RulesConfig>) : Rule("loc
             .toMap<PsiElement, List<KtProperty>>()
 
     @Suppress("UnsafeCallOnNullableType")
-    private fun handleLocalProperty(property: KtProperty, usages: List<KtNameReferenceExpression>) {
+    private fun handleLocalProperty(property: KtElement, usages: List<KtElement>) {
+        require(property is KtProperty)
         val declarationScope = property.getDeclarationScope()
 
         val firstUsageStatementLine = getFirstUsageStatementOrBlock(usages, declarationScope).node.lineNumber()!!
@@ -129,7 +127,7 @@ class LocalVariablesRule(private val configRules: List<RulesConfig>) : Rule("loc
      * @return either the line on which the property is used if it is first used in the same scope, or the block in the same scope as declaration
      */
     @Suppress("UnsafeCallOnNullableType")
-    private fun getFirstUsageStatementOrBlock(usages: List<KtNameReferenceExpression>, declarationScope: KtBlockExpression?): PsiElement {
+    private fun getFirstUsageStatementOrBlock(usages: List<KtElement>, declarationScope: KtBlockExpression?): PsiElement {
         val firstUsage = usages.minBy { it.node.lineNumber()!! }!!
         val firstUsageScope = firstUsage.getParentOfType<KtBlockExpression>(true)
 

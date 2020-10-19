@@ -29,14 +29,14 @@ abstract class VariablesSearch(val node: ASTNode, private val filterForVariables
      * to complete implementation of a search mechanism you need to specify what and how you will search in current scope
      * [this] - scope where to search the usages/assignments/e.t.c of the variable (can be of types KtBlockExpression/KtFile/KtClassBody)
      */
-    protected abstract fun KtElement.getAllSearchResults(property: KtProperty): List<KtNameReferenceExpression>
+    protected abstract fun KtElement.getAllSearchResults(property: KtProperty): List<KtElement>
 
     /**
      * method collects all declared variables and it's usages
      *
      * @return a map of a property to it's usages
      */
-    fun collectVariables(): Map<KtProperty, List<KtNameReferenceExpression>> {
+    fun collectVariables(): Map<KtProperty, List<KtElement>> {
         require(node.elementType == ElementType.FILE) {
             "To collect all variables in a file you need to provide file root node"
         }
@@ -48,7 +48,7 @@ abstract class VariablesSearch(val node: ASTNode, private val filterForVariables
     }
 
     @Suppress("UnsafeCallOnNullableType")
-    fun KtProperty.getSearchResults(): List<KtNameReferenceExpression> {
+    fun KtProperty.getSearchResults(): List<KtElement> {
         return this
                 .getDeclarationScope()
                 // if declaration scope is not null - then we have found out the block where this variable is stored
@@ -79,7 +79,7 @@ abstract class VariablesSearch(val node: ASTNode, private val filterForVariables
      *  all these scopes are on lower level of inheritance that's why if in one of these scopes we will find any
      *  variable declaration with the same name - we will understand that it is usage of another variable
      */
-    protected fun isReferenceToOtherVariableWithSameName(expression: KtNameReferenceExpression,
+    protected fun isReferenceToOtherVariableWithSameName(expression: KtElement,
                                                          codeBlock: KtElement, property: KtProperty): Boolean {
         return expression.parents
                 // getting all block expressions/class bodies/file node from bottom to the top
