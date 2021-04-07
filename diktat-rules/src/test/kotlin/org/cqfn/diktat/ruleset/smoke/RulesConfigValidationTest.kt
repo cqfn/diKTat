@@ -12,13 +12,16 @@ import org.junit.jupiter.api.assertThrows
 
 import java.io.File
 import java.lang.IllegalArgumentException
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createTempFile
 
+@OptIn(ExperimentalPathApi::class)
 class RulesConfigValidationTest {
     private lateinit var file: File
 
     @BeforeEach
     fun setUp() {
-        file = createTempFile()
+        file = createTempFile().toFile()
     }
 
     @AfterEach

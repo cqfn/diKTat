@@ -153,11 +153,15 @@ open class DiktatJavaExecTaskBase @Inject constructor(
             GradleVersion.version(gradleVersionString) >= GradleVersion.version("6.4")
 
     private fun MutableList<String>.addPattern(pattern: File, negate: Boolean = false) {
+        log.info("pattern - pattern - pattern: $pattern")
         val path = if (pattern.isAbsolute) {
-            pattern.relativeTo(project.projectDir)
+            pattern.relativeTo(project.projectDir).normalize()
         } else {
             pattern
-        }.path
+        }
+            .invariantSeparatorsPath
+        log.info("path - path - path: $path")
+        log.info("projectDir - projectDir - projectDir: ${project.projectDir}")
         add((if (negate) "!" else "") + path)
     }
 

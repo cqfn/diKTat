@@ -5,6 +5,7 @@ import generated.KTLINT_VERSION
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.attributes.Bundling
 
 /**
  * Plugin that configures diktat and registers tasks to run diktat
@@ -35,6 +36,9 @@ class DiktatGradlePlugin : Plugin<Project> {
                         "module" to "ktlint-ruleset-standard"
                     )
                 )
+                attributes {
+                    it.attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling::class.java, Bundling.EXTERNAL))
+                }
             }))
             configuration.dependencies.add(project.dependencies.create("org.cqfn.diktat:diktat-rules:$DIKTAT_VERSION"))
         }

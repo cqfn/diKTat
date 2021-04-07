@@ -56,6 +56,13 @@ import org.jetbrains.kotlin.kdoc.parser.KDocKnownTag
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocTag
 import org.jetbrains.kotlin.psi.KtThrowExpression
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
+import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.PathMatcher
+import java.nio.file.Paths
+import java.util.stream.Collectors
+import java.io.IOException
 
 /**
  * This rule checks that whenever the method has arguments, return value, can throw exceptions,
@@ -78,13 +85,31 @@ class KdocMethods(configRules: List<RulesConfig>) : DiktatRule(
     override fun logic(node: ASTNode) {
         if (node.elementType == FUN && node.getFirstChildWithType(MODIFIER_LIST).isAccessibleOutside() && !node.isOverridden()) {
             val config = configRules.getCommonConfiguration()
-            val filePath = node.getRootNode().getFilePath()
+            val path = node.getRootNode().getFilePath()
+
+            val dir = Paths.get(path).toAbsolutePath().toString().substringBeforeLast('\\')
+            val matcher: PathMatcher = FileSystems.getDefault().getPathMatcher("glob:.*$path")
+            val pathList: List<Path?> = find(dir, matcher)
+            val filePath = if (pathList.size == 1) pathList[0].toString() else ""
+
             val isTestMethod = node.hasTestAnnotation() || isLocatedInTest(filePath.splitPathToDirs(), config.testAnchors)
             if (!isTestMethod && !node.isStandardMethod() && !node.isSingleLineGetterOrSetter()) {
                 checkSignatureDescription(node)
             }
         } else if (node.elementType == KDOC_SECTION) {
             checkKdocBody(node)
+        }
+    }
+
+    private fun find(searchDirectory: String, matcher: PathMatcher): List<Path?> {
+        try {
+            Files.walk(Paths.get(searchDirectory)).use { files ->
+                return files
+                    .filter { path -> matcher.matches(path) }
+                    .collect(Collectors.toList())
+            }
+        } catch (e: IOException) {
+            return listOf()
         }
     }
 

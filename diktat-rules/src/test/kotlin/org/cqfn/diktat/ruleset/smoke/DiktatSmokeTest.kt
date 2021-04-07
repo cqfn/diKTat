@@ -28,6 +28,8 @@ import org.junit.jupiter.api.Test
 
 import java.time.LocalDate
 
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createTempFile
 import kotlinx.serialization.encodeToString
 
 typealias ruleToConfig = Map<String, Map<String, String>>
@@ -37,6 +39,7 @@ typealias ruleToConfig = Map<String, Map<String, String>>
  * Note: ktlint uses initial text from a file to calculate line and column from offset. Because of that line/col of unfixed errors
  * may change after some changes to text or other rules.
  */
+@OptIn(ExperimentalPathApi::class)
 class DiktatSmokeTest : FixTestBase("test/smoke/src/main/kotlin",
     { DiktatRuleSetProvider(configFilePath) },
     { lintError, _ -> unfixedLintErrors.add(lintError) },
@@ -59,7 +62,7 @@ class DiktatSmokeTest : FixTestBase("test/smoke/src/main/kotlin",
                     rulesConfig.add(RulesConfig(warning, enabled = true, configuration = configuration))
                 }
             }
-        createTempFile()
+        createTempFile().toFile()
             .also {
                 configFilePath = it.absolutePath
             }

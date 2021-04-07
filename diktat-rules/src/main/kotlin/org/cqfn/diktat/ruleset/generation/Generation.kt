@@ -16,6 +16,9 @@ import com.squareup.kotlinpoet.TypeSpec
 
 import java.io.File
 
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createTempFile
+
 /**
  * The comment that will be added to the generated sources file.
  */
@@ -56,13 +59,14 @@ private fun generateWarningNames() {
     kotlinFile.writeTo(File("diktat-rules/src/main/kotlin"))  // fixme: need to add it to pom
 }
 
+@OptIn(ExperimentalPathApi::class)
 private fun validateYear() {
     val files = File("diktat-rules/src/test/resources/test/paragraph2/header")
     files
         .listFiles()
         .filterNot { it.name.contains("CopyrightDifferentYearTest.kt") }
         .forEach { file ->
-            val tempFile = createTempFile()
+            val tempFile = createTempFile().toFile()
             tempFile.printWriter().use { writer ->
                 file.forEachLine { line ->
                     writer.println(when {
