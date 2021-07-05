@@ -68,7 +68,7 @@ class BooleanExpressionsRule(configRules: List<RulesConfig>) : DiktatRule(
         }
             ?: RulesHelper.applySet(expr, RulesHelper.demorganRules(), ExprOptions.noCaching())
         if (expr != simplifiedExpression) {
-            COMPLEX_BOOLEAN_EXPRESSION.warnAndFix(configRules, emitWarn, isFixMode, node.text, node.startOffset, node) {
+            COMPLEX_BOOLEAN_EXPRESSION.warnAndFix(configRules, emitWarn, isFixMode, "[${node.text}] to [$simplifiedExpression]", node.startOffset, node) {
                 fixBooleanExpression(node, simplifiedExpression, mapOfExpressionToChar)
             }
         }
@@ -112,7 +112,7 @@ class BooleanExpressionsRule(configRules: List<RulesConfig>) : DiktatRule(
             }
         var characterAsciiCode = 'A'.code  // `A` character in ASCII
         (logicalExpressions + elementaryBooleanExpressions).forEach { expression ->
-            mapOfExpressionToChar.computeIfAbsent(expression.textWithoutComments()) {
+            mapOfExpressionToChar.computeIfAbsent(expression.textWithoutComments().dropWhile {it == '!' }) {
                 // Every elementary expression is assigned a single-letter variable.
                 characterAsciiCode++.toChar()
             }

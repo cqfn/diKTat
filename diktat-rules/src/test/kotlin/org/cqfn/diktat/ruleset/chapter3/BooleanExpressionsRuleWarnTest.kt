@@ -211,6 +211,15 @@ class BooleanExpressionsRuleWarnTest : LintTestBase(::BooleanExpressionsRule) {
     }
 
     @Test
+    fun `test makeCorrectExpressionString method - should keep prefix negation`() {
+        checkExpressionFormatter(
+            "!a && b",
+            "(!A & B)",
+            2
+        )
+    }
+
+    @Test
     fun `test makeCorrectExpressionString method - comment should be removed`() {
         checkExpressionFormatter(
             """
