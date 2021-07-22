@@ -508,3 +508,8 @@
 # Check if boolean expression can be simplified
 - name: COMPLEX_BOOLEAN_EXPRESSION
   enabled: true
+# Check if range can replace with until or `rangeTo` function with range
+- name: CONVENTIONAL_RANGE
+  enabled: true
+  configuration:
+    isRangeToIgnore: false

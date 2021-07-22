@@ -28,6 +28,7 @@ import org.cqfn.diktat.ruleset.rules.chapter3.LongNumericalValuesSeparatedRule
 import org.cqfn.diktat.ruleset.rules.chapter3.MagicNumberRule
 import org.cqfn.diktat.ruleset.rules.chapter3.MultipleModifiersSequence
 import org.cqfn.diktat.ruleset.rules.chapter3.NullableTypeRule
+import org.cqfn.diktat.ruleset.rules.chapter3.RangeConventionalRule
 import org.cqfn.diktat.ruleset.rules.chapter3.SingleLineStatementsRule
 import org.cqfn.diktat.ruleset.rules.chapter3.SortRule
 import org.cqfn.diktat.ruleset.rules.chapter3.StringConcatenationRule
@@ -178,6 +179,7 @@ class DiktatRuleSetProvider(private var diktatConfigFile: String = DIKTAT_ANALYS
             ::AbstractClassesRule,
             ::TrailingCommaRule,
             ::SingleInitRule,
+            ::RangeConventionalRule,
             ::CustomLabel,
             ::VariableGenericTypeDeclarationRule,
             ::LongNumericalValuesSeparatedRule,
